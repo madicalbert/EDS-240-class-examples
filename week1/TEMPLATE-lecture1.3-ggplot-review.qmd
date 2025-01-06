@@ -188,13 +188,14 @@ penguin_summary <- penguins |>
 
 ```{r}
 #| warning: false
-# ~ CODE ALONG HERE ~
+ggplot(penguins, aes(x = species, y = after_stat(prop), group = 1)) +
+  geom_bar()
 ```
 
 ### Example 4 (default position adjustment)
 
 - position adjustments tweak position of elements to resolve overlapping geoms
-- all geoms have a default position (e.g. barplots have `position = "stack"`) -- see documentation
+- all geoms have a default position (e.g. bar plots have `position = "stack"`) -- see documentation
 - let's say we now want to visualize penguin counts by species (bar height) *and* by island (color):
 
 ```{r}
@@ -213,7 +214,6 @@ penguin_summary <- penguins |>
 
 - `position = "dodge"` places overlapping bars directly beside one another (easier to compare individual values):
 
-
 ```{r}
 #| warning: false
 # ~ CODE ALONG HERE ~
@@ -230,7 +230,8 @@ penguin_summary <- penguins |>
 
 ```{r}
 #| warning: false
-# ~ CODE ALONG HERE ~
+ggplot(penguins, aes(x = species)) +
+  geom_bar()
 ```
 
 ### Example 9 & 10 (alternative coordinate systems)
