@@ -5,3 +5,96 @@ date: January 6, 2024
 format: html
 ---
 
+### Load Libraries
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(usdata)
+```
+
+### Import fracking data 
+
+```{r}
+fracking <- read_csv(here("week1/data/registryupload_1.csv"))
+```
+
+### Data exploration 
+
+```{r}
+dim(fracking) #tells you how big the df is
+
+str(fracking) #tells you the structure of the df 
+
+view(fracking) #simply look at the df
+```
+
+
+### Clean Fracking Data 
+
+```{r}
+fracking_clean <- fracking %>% 
+  
+  clean_names() %>% #convert column names to snake case
+  
+  mutate(job_start_date = str_remove(job_start_date, " AM")) %>% #remove "AM" from start date
+  
+  mutate(datetime_start = mdy_hms(job_start_date)) %>% #new column with datetime objects
+  
+  mutate(year = year(datetime_start)) %>% #add a year column with year from datetime_start
+  
+  select(datetime_start, 
+         year, 
+         state_name, 
+         well_name, 
+         total_base_water_volume) %>%  #keep only necessary columns
+  
+  mutate(state_name = str_to_title(state_name)) %>%  #convert obsvs in the state_name column to Title Case
+  
+  filter(!str_detect(state_name, pattern = "\\?")) %>% #remove any rows where the state name ends in ?
+  
+  mutate(state_name = ifelse(       #convert any state abbreviations to full names in the state_name column
+    test = str_length(state_name) == 2, #b/c the abbreviations are only 2 characters long (ex: Pa)
+    yes = abbr2state(state_name),
+    no = state_name
+  )) %>% 
+  
+  mutate(state_name = case_when(  # correct any misspelled state names in the state_name
+    state_name == "Colordao" ~ "Colorado",
+    state_name == "Loiusiana" ~ "Louisiana",
+    state_name == "Louisianna" ~ "Louisiana",
+    state_name == "Lousiana" ~ "Louisiana",
+    state_name == "New Mexcio" ~ "New Mexico",
+    state_name == "Norh Dakota" ~ "North Dakota",
+    state_name == "Norht Dakota" ~ "North Dakota",
+    state_name == "North  Dakota" ~ "North Dakota",
+    state_name == "North Dakata" ~ "North Dakota",
+    state_name == "North Dakotta" ~ "North Dakota",
+    state_name == "Noth Dakota" ~ "North Dakota",
+    state_name == "Pennslvania" ~ "Pennsylvania",
+    state_name == "Pennsylavania" ~ "Pennsylvania",
+    state_name == "Pennsylvanya" ~ "Pennsylvania",
+    state_name == "Penssylvania" ~ "Pennsylvania",
+    state_name == "Texasa" ~ "Texas",
+    state_name == "Texs" ~ "Texas", 
+    state_name == "West Viginia" ~ "West Virginia",
+    state_name == "Wyominng" ~ "Wyoming", 
+    TRUE ~ state_name # copy over rest of state names from as-is
+  )) %>% 
+  
+  filter(!state_name %in% # remove any rows that do not have a true US state name
+           c("Beaver", "Beckham", "Harper", "Hemphill", "Midland", 
+             "Red River", "Roosevelt", "Rusk", "State", "Ward"))
+  
+
+
+fracking_clean
+```
+
+### NEED TO FINISH 
+
+k. add a column named state_abb with just US state abbreviations
+l. move the state_abb column so that it sits immediately after the state_name column
+m. rename total_base_water_volume as total_base_water_volume_gal for clarity
+n. remove any observations that don’t have a measurement for total_base_water_volume_gal (i.e. NA)
+o. reorder rows from earliest to most recent datetime_start values
