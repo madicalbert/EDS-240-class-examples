@@ -1,0 +1,7 @@
+---
+title: "week2-discussion"
+author: Madi Calbert
+date: January 13, 2024
+format: html
+---
+
