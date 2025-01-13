@@ -1,7 +1,7 @@
 ---
 title: "Lecture 2.2 TEMPLATE"
 subtitle: "Visualizing distributions"
-author: "Your Name"
+author: "Madi Calbert"
 date: 2025-01-13
 toc: true
 ---
@@ -29,6 +29,10 @@ This template follows [lecture 2.2 slides](https://eds-240-data-viz.github.io/co
 library(tidyverse)
 library(chron)
 library(naniar)
+library(ggridges)
+library(gghighlight)
+library(ggbeeswarm)
+library(see)
 library(palmerpenguins) # for some minimal examples
 
 #..........................import data...........................
@@ -93,6 +97,13 @@ missing_temps <- naniar::vis_miss(bottom)
 #| echo: true
 
 # histogram with all 12 months ----
+mko_clean %>% 
+  #overwrite the month_name column and change characters to factors
+  mutate(month_name = factor(month_name, levels = month.name)) %>% #month.name is built into R
+  ggplot(aes(x = Temp_bot, fill = month_name)) +
+  geom_histogram(position = "identity", alpha = 0.5) #change from default "stacked" and opacity
+
+# still a bit hard to interpret 
 ```
 
 ### Alt 1: small multiples
@@ -106,7 +117,9 @@ missing_temps <- naniar::vis_miss(bottom)
 # histogram faceted by month ----
 mko_clean |> 
   mutate(month_name = factor(month_name, levels = month.name)) |> 
-  ggplot(aes(x = Temp_bot, fill = month_name))
+  ggplot(aes(x = Temp_bot)) + #remove color, redundant and unnecessary 
+  geom_histogram() + 
+  facet_wrap(~month_name)
 ```
 
 ### Alt 2: fewer groups + update colors + modify bin widths
@@ -116,16 +129,21 @@ mko_clean |>
 #| echo: true
 #| warning: false
 
-# histogram with fewer months ----
+# histogram with fewer months; use these colors: c("#2C5374", "#ADD8E6", "#8B3A3A") ----
 mko_clean |> 
   mutate(month_name = factor(month_name, levels = month.name)) |> 
+  filter(month_name %in% c("April", "June", "October")) %>% 
   ggplot(aes(x = Temp_bot, fill = month_name)) +
-  geom_histogram(position = "identity", alpha = 0.5)
+  #binwidth depends on your research question and what you are visualilzing
+  geom_histogram(position = "identity", alpha = 0.5, color = "black", binwidth = 1) + 
+  scale_fill_manual(values = c("#2C5374", "#ADD8E6", "#8B3A3A"))
 ```
 
 ## Density plots
 
 - represent data distribution of a numeric variable(s); uses KDE to show probability density function of the variable, the y-axis represents the estimated density, i.e. the relative likelihood of a value occurring, and the area under each curve is equal to 1
+
+- 
 
 ### Too many groups
 
@@ -137,7 +155,10 @@ mko_clean |>
 # density plot with all 12 months ----
 mko_clean |> 
   mutate(month_name = factor(x = month_name, levels = month.name)) |> 
-  ggplot(aes(x = Temp_bot, fill = month_name)) 
+  ggplot(aes(x = Temp_bot, fill = month_name)) +
+  geom_density(alpha = 0.5)
+
+#messy 
 ```
 
 ### Alt 1: small multiples
@@ -151,7 +172,8 @@ mko_clean |>
 mko_clean |> 
   mutate(month_name = factor(month_name, levels = month.name)) |> 
   ggplot(aes(x = Temp_bot)) +
-  geom_density() 
+  geom_density(fill = "gray30") +
+  facet_wrap(~month_name)
 ```
 
 ### Alt 2: fewer groups + update colors + modify band widths
@@ -165,7 +187,11 @@ mko_clean |>
 mko_clean |> 
   filter(month_name %in% c("April", "June", "October")) |> 
   ggplot(aes(x = Temp_bot, fill = month_name)) +
-  geom_density(alpha = 0.5) 
+  # smaller binwidth (adjust = 0.5) will give you more variation b/c picking up on all the minute variations in the data, larger binwidth (adjust = 2) with give you less variation, default = 1
+  geom_density(alpha = 0.5, adjust = 0.5) +
+  scale_fill_manual(values = c("#2C5374", "#ADD8E6", "#8B3A3A"))
+
+
 ```
 
 ## A few more histograms & density plots
@@ -248,7 +274,18 @@ ggplot(penguins, aes(x = body_mass_g, y = after_stat(count))) +
 
 # basic ridgeline plot ----
 
+
 # fill with color gradient; use these colors: c("#2C5374","#849BB4", "#D9E7EC", "#EF8080", "#8B3A3A") ----
+ggplot(mko_clean, aes(x = Temp_bot, y = month_name, fill = after_stat(x))) + 
+  # have to specify where you want the gradient to go with after_stat
+  
+  geom_density_ridges_gradient(rel_min_height = 0.01, #rel_min_height to shorten tails
+                               scale = 3) + # to set the height of the ridges and overlap 
+  
+  scale_fill_gradientn(colors = c("#2C5374","#849BB4", "#D9E7EC", "#EF8080", "#8B3A3A")) +
+  
+  #to adjust the order of the y variables, represent order of months
+  scale_y_discrete(limits = rev(month.name)) #use rev() to reverse the order!
 
 ```
 
@@ -266,6 +303,28 @@ ggplot(mko_clean, aes(x = Temp_bot, y = month_name, fill = after_stat(x))) +
   scale_fill_gradientn(colors = c("#2C5374","#849BB4", "#D9E7EC", "#EF8080", "#8B3A3A"))
 ```
 
+Remember, you can also reorder factor levels during the data wrangling stage:
+
+```{r}
+#| eval: true
+#| echo: true
+#| warning: false
+#| message: false
+#| layout-ncol: 2
+
+# e.g. by month: ----
+mko_clean |> 
+  ggplot(aes(x = Temp_bot, y = month_name, fill = after_stat(x))) +
+  ggridges::geom_density_ridges_gradient(rel_min_height = 0.01, scale = 3) +
+  scale_fill_gradientn(colors = c("#2C5374","#849BB4", "#D9E7EC", "#EF8080", "#8B3A3A"))
+
+# e.g. by median temp ---
+mko_clean |> 
+  ggplot(aes(x = Temp_bot, y = month_name, fill = after_stat(x))) +
+  ggridges::geom_density_ridges_gradient(rel_min_height = 0.01, scale = 3) +
+  scale_fill_gradientn(colors = c("#2C5374","#849BB4", "#D9E7EC", "#EF8080", "#8B3A3A"))
+```
+
 ### Alt 2: add quantiles
 
 ```{r}
@@ -275,7 +334,10 @@ ggplot(mko_clean, aes(x = Temp_bot, y = month_name, fill = after_stat(x))) +
 #| message: false
 
 # ridgeline plot with quantiles ----
-ggplot(mko_clean, aes(x = Temp_bot, y = month_name))
+ggplot(mko_clean, aes(x = Temp_bot, y = month_name)) +
+  ggridges::stat_density_ridges(rel_min_height = 0.01, scale = 3,
+                                quantile_lines = TRUE, quantiles = 2) +
+  scale_y_discrete(limits = rev(month.name))
 ```
 
 ### Alt 3: jitter raw data
@@ -288,7 +350,14 @@ ggplot(mko_clean, aes(x = Temp_bot, y = month_name))
 #| message: false
 
 # jittered points (and raincloud option) ----
+ggplot(penguins, aes(x = body_mass_g, y = species)) +
+  ggridges::geom_density_ridges(jittered_points = TRUE, 
+                                alpha = 0.5, point_size = 0.5)
 
+ggplot(penguins, aes(x = body_mass_g, y = species)) +
+  ggridges::geom_density_ridges(jittered_points = TRUE, alpha = 0.5, 
+                                point_size = 0.5, scale = 0.6,
+                                position = "raincloud")
 ```
 
 ## Boxplots
@@ -301,6 +370,10 @@ ggplot(mko_clean, aes(x = Temp_bot, y = month_name))
 #| warning: false
 
 # boxplot with all 12 months ----
+ggplot(mko_clean, aes(x = month_name, y = Temp_bot)) +
+  geom_boxplot() +
+  scale_x_discrete(limits = rev(month.name)) + #to reorder the months
+  coord_flip() # to better visualize the month names 
 ```
 
 ### Alt 1: modify outliers
@@ -312,8 +385,8 @@ ggplot(mko_clean, aes(x = Temp_bot, y = month_name))
 
 # boxplot with modified outliers ----
 ggplot(mko_clean, aes(x = month_name, y = Temp_bot)) +
-  geom_boxplot() +
-  scale_x_discrete(limits = rev(month.name)) + 
+  geom_boxplot(outlier.color = "purple", outlier.shape = 1, outlier.size = 5) +
+  scale_x_discrete(limits = rev(month.name)) +
   coord_flip()
 ```
 
@@ -325,10 +398,12 @@ ggplot(mko_clean, aes(x = month_name, y = Temp_bot)) +
 #| warning: false
 
 # highlight a particular group ----
-ggplot(mko_clean, aes(x = month_name, y = Temp_bot)) +
+ggplot(mko_clean, aes(x = month_name, y = Temp_bot, fill = month_name)) + #color fill the highlight 
   geom_boxplot() +
   scale_x_discrete(limits = rev(month.name)) + 
-  coord_flip()
+  gghighlight(month_name == "October") + #to highlight just one variable
+  coord_flip() +
+  theme(legend.position = "none") #remove the legend
 ```
 
 ### Alt 3: jitter raw data (using `{palmerpenguins}` data) 
@@ -339,8 +414,9 @@ ggplot(mko_clean, aes(x = month_name, y = Temp_bot)) +
 #| warning: false
 
 # add jittered data points ----
-ggplot(palmerpenguins::penguins, aes(x = species, y = body_mass_g)) +
-  geom_boxplot()
+ ggplot(penguins, aes(x = species, y = body_mass_g)) +
+  geom_boxplot(outlier.shape = NA) + #removes outliers to avoid repeat data 
+  geom_jitter(alpha = 0.5, size = 1, width = 0.2) 
 ```
 
 ### Alt 4: dodged groups
@@ -351,8 +427,10 @@ ggplot(palmerpenguins::penguins, aes(x = species, y = body_mass_g)) +
 #| warning: false
 
 # dodge groups by year ----
-ggplot(palmerpenguins::penguins, aes(x = species, y = body_mass_g)) +
-  geom_boxplot(outlier.shape = NA) 
+ggplot(penguins, aes(x = species, y = body_mass_g, color = as.factor(year))) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_point(alpha = 0.5, 
+             position = position_jitterdodge(jitter.width = 0.2))
 ```
 
 ### Alt 5: overlay beeswarm
@@ -363,8 +441,9 @@ ggplot(palmerpenguins::penguins, aes(x = species, y = body_mass_g)) +
 #| warning: false
 
 # boxplot + beeswarm ----
-ggplot(palmerpenguins::penguins, aes(x = species, y = body_mass_g)) +
-  geom_boxplot(outlier.shape = NA) 
+ggplot(penguins, aes(x = species, y = body_mass_g)) +
+  geom_boxplot(outlier.shape = NA) +
+  ggbeeswarm::geom_beeswarm(size = 1) 
 ```
 
 ## Violin plots
@@ -377,7 +456,10 @@ ggplot(palmerpenguins::penguins, aes(x = species, y = body_mass_g)) +
 #| warning: false
 
 # violin plot ----
-ggplot(mko_clean, aes(x = month_name, y = Temp_bot))
+ggplot(mko_clean, aes(x = month_name, y = Temp_bot)) +
+  geom_violin() +
+  scale_x_discrete(limits = rev(month.name)) +
+  coord_flip()
 ```
 
 ### Alt 1: overlay boxplot
@@ -390,6 +472,10 @@ ggplot(mko_clean, aes(x = month_name, y = Temp_bot))
 # violin + boxplot ----
 ggplot(mko_clean, aes(x = month_name, y = Temp_bot)) +
   geom_violin() +
+  geom_boxplot(width = 0.1,  #width of boxplots, play around w/ numbers 
+               color = "gray",
+               alpha = 0.5, #transparency
+               outlier.color = "red") +
   scale_x_discrete(limits = rev(month.name)) +
   coord_flip()
 ```
@@ -402,5 +488,8 @@ ggplot(mko_clean, aes(x = month_name, y = Temp_bot)) +
 #| warning: false
 
 # half violin + half dot plot ----
+ggplot(penguins, aes(x = species, y = bill_length_mm, fill = species)) +
+  see::geom_violindot(size_dots = 5, alpha = 0.5) +
+  theme(legend.position = "none")
 ```
 
