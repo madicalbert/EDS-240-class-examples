@@ -1,7 +1,99 @@
 ---
 title: "week2-discussion"
 author: Madi Calbert
-date: January 13, 2024
+date: January 14, 2024
 format: html
 ---
+
+```{r}
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+##                                    setup                                 ----
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#..........................load packages.........................
+library(tidyverse)
+
+#..........................import data...........................
+drought <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2021/2021-07-20/drought.csv')
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+##                            wrangle drought data                          ----
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+drought_clean <- drought |>
+
+  # select cols of interest & update names for clarity (as needed) ----
+  select(date = valid_start, state_abb, drought_lvl, area_pct) |> 
+
+  # add year, month & day cols using {lubridate} fxns ----
+  # NOTE: this step isn't necessary for our plot, but I'm including as examples of how to extract different date elements from a object of class `Date` using {lubridate} ----
+  mutate(year = year(date),
+         month = month(date, label = TRUE, abbr = TRUE),
+         day = day(date)) |>
+
+  # add drought level conditions names ----
+  mutate(drought_lvl_long = factor(drought_lvl,
+                            levels = c("D4", "D3", "D2", "D1","D0", "None"),
+                            labels = c("(D4) Exceptional", "(D3) Extreme",
+                                       "(D2) Severe", "(D1) Moderate", 
+                                       "(D0) Abnormally Dry", 
+                                       "No Drought"))) |>
+  
+  # reorder cols ----
+  relocate(date, year, month, day, state_abb, drought_lvl, drought_lvl_long, area_pct)
+```
+a). Create a stacked area chart (take a look back at lecture 2.3 slides for examples)
+
+b). Figure out how to order the drought level groups in the same way as the USDM version (i.e. level D4 on the bottom, closet to the x-axis, and level D0 at the top) – Hint: explore the position argument
+
+c) Update the colors so that they match the USDM version (use Colorpick Eyedropper to grab HEX codes from the original visualization) – Hint: use scale_fill_manual() to set your new colors
+
+d) Adjust your x-axis “breaks” (i.e. the tick mark values that represent years) – Hint: check out scale_x_date() and scales::breaks_pretty()
+
+e) Adjust your y-axis “breaks” (i.e. the tick mark value that represent percentage of affected area) – Hint: check out scale_y_continous() and scales::label_percent()
+
+f) Remove the “padding” (i.e. space) between your area chart and the x- and y-axes – Hint: check out the expand argument in scale_x_date() and scale_y_continuous()
+
+g) update the plot title
+
+```{r}
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+##       create stacked area plot of CA drought conditions through time     ----
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+drought_clean |> 
+  
+  # b. remove drought_lvl "None" & filter for just CA ----
+  filter(drought_lvl != "None",
+         state_abb == "CA") %>% 
+  ggplot(aes(x = date, y = area_pct, fill = drought_lvl_long)) +
+  
+  #a. reverse order of groups so level D4 is clsoest to the x axis
+  geom_area(position = position_stack(reverse = TRUE)) +
+  
+  #c. update colors 
+  scale_fill_manual(values = c("#853904", "#FF0000", "#FFC100", "#FFD965", "#FFFF00")) +
+  
+  #d) Adjust your x-axis “breaks” and f) Remove the “padding” 
+  scale_x_date(breaks = scales::breaks_pretty(n = 10),
+               expand = c(0,0)) +
+  
+  #e) Adjust your y-axis “breaks” and f) Remove the “padding” 
+  scale_y_continuous(breaks = scales::breaks_pretty(n = 10), #increments of 10
+                     labels = scales::label_percent(scale = 1), #adds the percent sign
+                     expand = c(0,0)) +
+  
+  #g) update the plot title
+ labs(title = "Drought Area in California", 
+      x = NULL,
+      y = NULL,
+      fill = NULL) +
+  
+  theme_minimal() +
+  
+  theme(legend.position = "bottom",
+        plot.title = element_text(hjust = 0.5))
+  
+```
+
 
