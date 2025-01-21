@@ -1,0 +1,62 @@
+---
+title: "week3-discussion"
+author: Madi Calbert
+date: January 20, 2024
+format: html
+---
+
+# Example 1
+
+## Adding alt text in a code chunk
+
+1.  Copy the following code into your week3-discussion.qmd file and add code chunk options that: render the output (i.e. plot), but not the code suppress any warnings or messages
+2.  Add alt text using the fig-alt: code chunk option
+3.  “Inspect” your plot (right click \> Inspect) to verify that the alt attribute and text is added to the HTML
+
+```{r}
+library(ggplot2)
+library(palmerpenguins)
+```
+
+```{r}
+#| warning: false
+#| message: false
+#| eval: true #evaluate aka awknowledge the code block
+#| echo: false #include output but not show code block
+#| fig-cap: "A Histogram showing the distribution of body mass in grams of three species of penguins: Adelie (orange), Chinstrap (Chinstrap), and Gentoo (teal)."
+#| fig-alt: "A Histogram showing the distribution of body mass in grams of three species of penguins where Gentoo penguins are 2,000 grams larger than Adelie and Chinstrap."
+
+ggplot(data = penguins, aes(x = body_mass_g, fill = species)) +
+  geom_histogram(alpha = 0.5, 
+                 position = "identity") +
+  scale_fill_manual(values = c("darkorange","purple","cyan4")) +
+  labs(x = "Body mass (g)",
+       y = "Frequency",
+       title = "Penguin body masses")
+```
+
+# Example 2
+
+## Using R markdown syntax
+
+1.  Download this viz (right click \> Save Image As… \> save to your class repo)
+2.  Embed the viz in week3-discussion.qmd using Markdown syntax and add alt text:
+3.  “Inspect” your image (right click \> Inspect) to verify that the alt attribute and text is added to the HTML
+
+![Dot plot showing the distribution of temperature across the 20th century for each month in a given year.](global_temp_viz.png){fig-alt="A dot plot of monthly global temperatures compared to the 20th-century average, where monthly global temperatures are increasing over time. Nearly every month since the mid-1970s is warmer than the 20th century average, with 12 record breaking hot months occurring between 2015-2023."}
+
+# Example 3
+
+## Using HTML syntax
+
+1.  Download this viz (right click \> Save Image As… \> save to your class repo)
+2.  Embed the viz in week3-discussion.qmd using HTML syntax and add alt text (you’ll also need to include the width attribute to make the image a bit smaller):
+3.  “Inspect” your image (right click \> Inspect) to verify that the alt attribute and text is added to the HTML
+
+<img src="species.png" alt="A heat map of global species observations where the highest concentration of observations occur in high-income countries, particularly in the USA and European nations."/>
+
+# Example 4
+
+## Write alt text for viz of your choice
+
+![Patterns of population density throughout the ranges of species.](bunting.png){fig-alt="The abundant center distribution of the indigo bunting (*Passerina cyanea*); with numerical values representing per transect densities determined from Breeding Bird Surveys. As per the abundant center model, densities are highest in the relative center of the range and lowest at the range margins."}
