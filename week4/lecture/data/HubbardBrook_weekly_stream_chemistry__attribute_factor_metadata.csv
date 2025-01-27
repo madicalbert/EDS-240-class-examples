@@ -1,0 +1,26 @@
+code,definition,attributeName,metadata_pid
+W1,Watershed 1,site,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+W2,Watershed 2,site,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+W3,Watershed 3,site,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+W4,Watershed 4,site,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+W5,Watershed 5,site,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+W6,Watershed 6,site,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+W7,Watershed 7,site,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+W8,Watershed 8,site,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+W9,Watershed 9,site,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+W101,Watershed 101,site,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+HBK,Hubbard Brook Main Stem,site,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+ML70,Mirror Lake outlet,site,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+319,Ice Storm samples (Hubbard Brook 1998),fieldCode,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+888,Multiple Samples in a day,fieldCode,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+907,"USFS Lab Chemistry (April 15, 2013 began running cations and anions analysis)",fieldCode,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+920,"Cary Lab Chemistry (April 1, 2013 ended all analysis)",fieldCode,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+911,"High flow streamwater sample; taken during specific event, not usually a routine weekly sample.",fieldCode,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+912,"Low flow streamwater sample; taken with a syringe or cup from a standing pool of water, usually during a drought period.",fieldCode,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+955,Extremely low volume precipitation sample; applies to samples when volume is insufficient to conduct all analyses. -3 or -999.9 will be entered into the files as code for QNS (quantity not sufficient),fieldCode,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+960,multiple samples on same day (W1 & W6 2001-2003),fieldCode,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+966,multiple samples on same day (W1 & W6 2001-2003),fieldCode,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+969,"Possible analytical problem based on return lab data; flagged for further scrutiny and possible rejection. In most cases, suspect data are rejected (see code 970).",fieldCode,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+970,"Sample contaminated; possible rejection based on further analytical data. This a flag code for future screening of the data. Protocol requires rejection of heavily tainted samples, but in many cases the degree of contamination is uncertain. NOTE if a code of 970 is retained in the database chemistry file, the flux program will ignore those data. All codes for 970’s must be re-checked.",fieldCode,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+TRUE,Sample was used in the estimation of previously reported monthly and annual volume-weighted concentrations and in calculating watershed fluxes,canonical,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
+FALSE,Sample was not used in the estimation of previously reported monthly and annual volume-weighted concentrations and in calculating watershed fluxes,canonical,https://pasta.lternet.edu/package/metadata/eml/knb-lter-hbr/208/11
