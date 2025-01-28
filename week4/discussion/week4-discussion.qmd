@@ -1,5 +1,121 @@
 ---
 title: "week4-discussion"
+author: Madi Calbert
+date: January 28, 2024
 format: html
 ---
+
+```{r}
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+##                                    setup                                 ----
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#..........................load packages.........................
+library(tidyverse)
+
+#..........................import data...........................
+drought <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2021/2021-07-20/drought.csv')
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+##                            wrangle drought data                          ----
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+drought_clean <- drought |>
+
+  # select cols of interest & update names for clarity (as needed) ----
+  select(date = valid_start, state_abb, drought_lvl, area_pct) |> 
+
+  # add year, month & day cols using {lubridate} fxns ----
+  # NOTE: this step isn't necessary for our plot, but I'm including as examples of how to extract different date elements from a object of class `Date` using {lubridate} ----
+  mutate(year = year(date),
+         month = month(date, label = TRUE, abbr = TRUE),
+         day = day(date)) |>
+
+  # add drought level conditions names ----
+  mutate(drought_lvl_long = factor(drought_lvl,
+                            levels = c("D4", "D3", "D2", "D1","D0", "None"),
+                            labels = c("(D4) Exceptional", "(D3) Extreme",
+                                       "(D2) Severe", "(D1) Moderate", 
+                                       "(D0) Abnormally Dry", 
+                                       "No Drought"))) |>
+  
+  # reorder cols ----
+  relocate(date, year, month, day, state_abb, drought_lvl, drought_lvl_long, area_pct)
+```
+
+
+```{r}
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+##       create stacked area plot of CA drought conditions through time     ----
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+drought_clean |> 
+  
+  # b. remove drought_lvl "None" & filter for just CA ----
+  filter(drought_lvl != "None",
+         state_abb == "CA") %>% 
+  ggplot(aes(x = date, y = area_pct, fill = drought_lvl_long)) +
+  
+  #a. reverse order of groups so level D4 is clsoest to the x axis
+  geom_area(position = position_stack(reverse = TRUE)) +
+  
+  #c. update colors 
+  scale_fill_manual(values = c("#853904", "#FF0000", "#FFC100", "#FFD965", "#FFFF00")) +
+  
+  #d) Adjust your x-axis “breaks” and f) Remove the “padding” 
+  scale_x_date(breaks = scales::breaks_pretty(n = 10),
+               expand = c(0,0)) +
+  
+  #e) Adjust your y-axis “breaks” and f) Remove the “padding” 
+  scale_y_continuous(breaks = scales::breaks_pretty(n = 10), #increments of 10
+                     labels = scales::label_percent(scale = 1), #adds the percent sign
+                     expand = c(0,0)) +
+  
+  #g) update the plot title
+ labs(title = "Drought Area in California", 
+      x = NULL,
+      y = NULL,
+      fill = NULL) +
+  
+  # includes major and minor grid lines and no axes
+  theme_minimal() +
+  
+  theme(
+        #update title
+        plot.title = element_text(hjust = 0.5,
+                                  color = "#686868",
+                                  size = 20,
+                                  #sets margin buffer so top, right, bottom, and left 
+                                  margin = margin(t = 10, r = 0, b = 15, l = 0)
+                                  ),
+        
+        #move legend and update size
+        legend.title = element_blank(),
+        legend.position = "bottom",
+        legend.key.height = unit(0.25, "cm"),
+        legend.key.width = unit(0.4, "cm"),
+        
+        #add rectangle around
+        plot.background = element_rect(color = "#686868"),
+        
+        #update axis lines and tick colors
+        axis.title = element_blank(),
+        axis.line = element_line(color = "#5A9CD6"), 
+        axis.ticks = element_line(color = "#5A9CD6"), 
+        axis.ticks.length = unit(0.2, "cm"),
+        
+        #update legend and axis font size
+        axis.text = element_text(color = "#686868",
+                                 size = 12),
+        legend.text = element_text(color = "#686868",
+                                 size = 12),
+        
+        #update plot margins
+        plot.margin = margin(t = 10, r = 10, b = 10, l = 10)
+        )
+        
+
+  
+```
+
 

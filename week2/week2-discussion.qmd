@@ -1,5 +1,5 @@
 ---
-title: "week2-discussion"
+title: "week4-discussion"
 author: Madi Calbert
 date: January 14, 2024
 format: html
@@ -89,11 +89,8 @@ drought_clean |>
       y = NULL,
       fill = NULL) +
   
-  theme_minimal() +
-  
-  theme(legend.position = "bottom",
-        plot.title = element_text(hjust = 0.5))
-  
+  # includes major and minor grid lines and no axes
+  theme_minimal() 
 ```
 
 
