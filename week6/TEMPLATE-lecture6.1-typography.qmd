@@ -78,6 +78,7 @@ font_add(family = "fa-solid",
 
 #......enable {showtext} rendering for all newly opened GDs......
 showtext.auto() #must turn showtext on 
+showtext_opts(dpi = 300)
 
 #..........................import data...........................
 # find import code at: https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-03-05#grab-the-clean-data-here
@@ -254,31 +255,37 @@ final_plot <- ggplot(subset_jobs) +
        subtitle = subtitle,
        caption = caption) +
   
-  theme_minimal() +
+  theme_minimal(base_size = 7) +
   
   theme(
     plot.title.position = "plot", #moves titles over to left hand side 
     plot.title = element_text(family = "josefin", #add the Google font
                               face = "bold",
-                              size = 18, 
+                              size = rel(1.7), 
                               color = earnings_pal["dark_text"]),
     plot.subtitle = ggtext::element_textbox(family = "sen", #use element_textbox!!!!!!
-                                 size = 11.5,
+                                 size = rel(1.1),
                                  color = earnings_pal["light_text"],
-                                 margin = margin(t = 2, r = 0, b = 6, l = 0)), #adds breathing room 
+                                 #fill = "lightblue", #for debugging
+                                 width = unit(25, "cm"),
+                                 margin = margin(t = 2, r = 0, b = 6, l = 0),
+                                 padding = margin(t=5, r=0, b=5, l=0)),  
     plot.caption = ggtext::element_textbox(family = "sen", 
                                 face = "italic", #data source on bottom rigth
                                 color = earnings_pal["light_text"],
+                                #fill = "lightblue", #for debugging
+                                width = unit(25, "cm"),
                                 margin = margin(t = 15),
                                 halign = 1, 
-                                lineheight = 1.5),
+                                lineheight = 1.5,
+                                padding = margin(t=10, r=0, b=10, l=0)),
     strip.text = element_text(family = "josefin", 
                               face = "bold", #titles of each facet panel 
-                              size = 10, 
+                              size = rel(1.1), 
                               hjust = 0),
     panel.spacing.y = unit(0.5, "cm"), #spacing around panels
     axis.text = element_text(family = "sen", 
-                             size = 9, #y-axis label
+                             size = rel(0.8), #y-axis label
                              color = earnings_pal["light_text"]),
     axis.title = element_blank()
     
@@ -298,9 +305,10 @@ ggsave(
   filename = here::here("week6", "images", "salary-plot.png"),
   plot = final_plot, 
   device = "png",
-  width = 8, 
-  height = 7,
-  unit = "in"
+  width = 5, 
+  height = 5,
+  unit = "in",
+  dpi = 300
 )
 ```
 
